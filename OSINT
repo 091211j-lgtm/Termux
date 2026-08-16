@@ -1,0 +1,20 @@
+                                               #!/bin/bash
+
+# Verifica que se haya proporcionado el nombre completo
+if [ "$#" -ne 2 ]; then
+    echo "Uso: $0 <nombre> <apellido>"
+    exit 1
+fi
+
+NOMBRE=$1
+APELLIDO=$2
+
+# Buscar en Google (limitado a resultados de LinkedIn)
+echo "Buscando en Google..."
+curl -s "https://www.google.com/search?q=site:linkedin.com+$NOMBRE+$APELLIDO" | grep -oP '(?<=href=")(https://[^"]+)' | uniq
+
+# Buscar en GitHub
+echo "Buscando en GitHub..."
+curl -s "https://api.github.com/search/users?q=$NOMBRE+$APELLIDO" | jq '.items[] | {login: .login, html_url: .html_url}'
+
+echo "Búsqueda completada."
